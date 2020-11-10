@@ -1,7 +1,1 @@
-<!DOCTYPE html>
-
-<body>
-	<h1>Test</h1>
-</body>
-
-</html>
+<h1>Test Page 123</h1>
