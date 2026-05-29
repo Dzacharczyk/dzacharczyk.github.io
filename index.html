@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Driver Schedule</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --orange:#F26B1D;
+    --orange-d:#C9540F;
+    --orange-soft:#FDEBDD;
+    --orange-soft-2:#FBDCC4;
+    --ink:#1d1d1f;
+    --ink-soft:#5b5b5f;
+    --line:#dcdcdc;
+    --line-strong:#bfbfbf;
+    --white:#ffffff;
+    --bg:#ffffff;
+    --hdr-font:"Oswald", "Arial Narrow", system-ui, sans-serif;
+    --body-font:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+    --mono-font:"IBM Plex Mono", ui-monospace, "Courier New", monospace;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--body-font);
+    font-size:14px;
+    line-height:1.4;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    border-top:6px solid var(--orange);
+    background:#fff;
+    border-bottom:1px solid var(--line);
+  }
+  .hazard{
+    height:8px;
+    background:repeating-linear-gradient(135deg,
+      var(--orange) 0 18px, #1d1d1f 18px 36px);
+    opacity:.9;
+  }
+  .topbar-inner{
+    max-width:1500px;
+    margin:0 auto;
+    padding:18px 26px 16px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:18px;
+  }
+  .brand{ display:flex; align-items:center; gap:14px; }
+  .brand .mark{
+    width:46px; height:46px;
+    background:var(--orange);
+    display:grid; place-items:center;
+    border-radius:6px;
+    color:#fff; font-family:var(--hdr-font); font-weight:700; font-size:24px;
+    box-shadow:0 2px 0 var(--orange-d);
+  }
+  .brand h1{
+    font-family:var(--hdr-font);
+    font-weight:700;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    font-size:26px;
+    margin:0;
+    line-height:1;
+  }
+  .brand .sub{
+    font-size:12px; color:var(--ink-soft);
+    text-transform:uppercase; letter-spacing:.12em; margin-top:5px;
+  }
+
+  .controls{ display:flex; align-items:flex-end; gap:14px; flex-wrap:wrap; }
+  .field{ display:flex; flex-direction:column; gap:5px; }
+  .field label{
+    font-size:10.5px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.1em; color:var(--ink-soft);
+  }
+  .field input[type="week"], .field input[type="text"]{
+    font-family:var(--body-font); font-size:14px;
+    padding:8px 10px; border:1.5px solid var(--line-strong); border-radius:5px;
+    background:#fff; color:var(--ink); min-width:180px;
+  }
+  .field input:focus{ outline:none; border-color:var(--orange); box-shadow:0 0 0 3px var(--orange-soft); }
+
+  .btn{
+    font-family:var(--hdr-font); font-weight:600; letter-spacing:.05em;
+    text-transform:uppercase; font-size:14px;
+    padding:10px 18px; border-radius:5px; border:1.5px solid transparent;
+    cursor:pointer; transition:.12s; white-space:nowrap;
+  }
+  .btn-primary{ background:var(--orange); color:#fff; box-shadow:0 2px 0 var(--orange-d); }
+  .btn-primary:hover{ background:var(--orange-d); }
+  .btn-primary:active{ transform:translateY(1px); box-shadow:0 1px 0 var(--orange-d); }
+  .btn-ghost{ background:#fff; color:var(--ink); border-color:var(--line-strong); }
+  .btn-ghost:hover{ border-color:var(--orange); color:var(--orange-d); }
+
+  /* ---------- Meta row ---------- */
+  .meta{
+    max-width:1500px; margin:0 auto; padding:14px 26px 0;
+    display:flex; gap:22px; flex-wrap:wrap; align-items:flex-end;
+  }
+  .meta .field input[type="text"]{ min-width:220px; }
+  .week-range{
+    font-family:var(--hdr-font); font-weight:600; font-size:18px;
+    color:var(--orange-d); text-transform:uppercase; letter-spacing:.03em;
+    padding-bottom:8px;
+  }
+
+  /* ---------- Sections / tables ---------- */
+  main{ max-width:1500px; margin:0 auto; padding:8px 26px 60px; }
+  .section{ margin-top:30px; }
+  .section-head{
+    display:flex; align-items:center; gap:12px; margin-bottom:10px;
+  }
+  .section-head .tag{
+    background:#1d1d1f; color:#fff; font-family:var(--hdr-font); font-weight:600;
+    text-transform:uppercase; letter-spacing:.08em; font-size:13px;
+    padding:5px 12px; border-radius:4px;
+  }
+  .section-head h2{
+    font-family:var(--hdr-font); text-transform:uppercase; letter-spacing:.04em;
+    font-size:20px; margin:0; font-weight:700;
+  }
+  .section-head .count{ font-size:12px; color:var(--ink-soft); }
+
+  .table-wrap{ overflow-x:auto; border:1px solid var(--line); border-radius:8px; background:#fff; }
+  table{ border-collapse:collapse; width:100%; min-width:980px; }
+  thead th{
+    background:var(--orange);
+    color:#fff;
+    font-family:var(--hdr-font); font-weight:600; text-transform:uppercase;
+    letter-spacing:.05em; font-size:12.5px;
+    padding:9px 8px; text-align:left; border-right:1px solid rgba(255,255,255,.25);
+    position:sticky; top:0; z-index:2;
+  }
+  thead th .dow{ display:block; font-size:13px; }
+  thead th .dt{ display:block; font-size:10.5px; font-weight:500; opacity:.92; letter-spacing:.02em; }
+  thead th:last-child{ border-right:none; }
+  .col-eq{ width:92px; }
+  .col-job, .col-loc{ width:150px; }
+
+  tbody td{
+    padding:6px; border-right:1px solid var(--line); border-top:1px solid var(--line);
+    vertical-align:top;
+  }
+  tbody td:last-child{ border-right:none; }
+  tbody tr:nth-child(even) td{ background:#fafafa; }
+
+  .eq-id{
+    font-family:var(--mono-font); font-weight:600; font-size:14px;
+    background:#1d1d1f; color:#fff; padding:5px 8px; border-radius:4px;
+    display:inline-block; letter-spacing:.02em;
+  }
+  td.eq-cell{ text-align:center; }
+
+  .day-cell{ min-width:178px; position:relative; }
+  .day-cell select.drv{
+    width:100%; border:1px solid var(--line-strong); border-radius:4px;
+    padding:4px 6px; font-family:var(--body-font); font-size:12px; background:#fff;
+    color:var(--ink);
+  }
+  .day-cell select:focus, .day-cell input:focus{
+    outline:none; border-color:var(--orange); box-shadow:0 0 0 2px var(--orange-soft);
+  }
+
+  /* maintenance toggle row */
+  .maint-row{
+    display:flex; align-items:center; gap:6px; margin-bottom:6px;
+    font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--ink-soft); cursor:pointer; user-select:none;
+  }
+  .maint-row input{ accent-color:var(--orange); width:14px; height:14px; cursor:pointer; }
+
+  /* shift block */
+  .shift{ border-left:3px solid var(--line-strong); padding-left:6px; margin-bottom:8px; }
+  .shift.day{ border-left-color:var(--orange); }
+  .shift.night{ border-left-color:#1d1d1f; }
+  .shift .shift-label{
+    font-family:var(--hdr-font); font-size:10px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.08em; color:var(--ink-soft); display:block; margin-bottom:3px;
+  }
+  .shift.day .shift-label{ color:var(--orange-d); }
+  .shift input.tm, .shift input.sf{
+    width:100%; margin-top:4px; border:1px solid var(--line-strong); border-radius:4px;
+    padding:4px 6px; font-family:var(--body-font); font-size:11.5px; background:#fff;
+  }
+  .shift input.tm{ font-family:var(--mono-font); }
+
+  /* highlight cell when any shift has a driver */
+  .day-cell.assigned{ background:var(--orange-soft) !important; }
+
+  /* maintenance state */
+  .day-cell.maint{
+    background:repeating-linear-gradient(135deg,
+      #fff 0 9px, var(--orange-soft-2) 9px 18px) !important;
+  }
+  .day-cell.maint .shift{ opacity:.4; pointer-events:none; }
+  .day-cell .avail-tag{
+    display:none; font-size:10px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.06em; color:#2e7d32; margin-top:2px;
+  }
+
+  .hint{
+    font-size:12px; color:var(--ink-soft); margin:14px 0 0; padding-left:2px;
+  }
+  .hint b{ color:var(--orange-d); }
+
+  /* ---------- Print view (hidden on screen) ---------- */
+  #printRoot{ display:none; }
+
+  @media print{
+    @page{ size:landscape; margin:0.4in; }
+    body{ background:#fff; }
+    .topbar, main, .meta{ display:none !important; }
+    #printRoot{ display:block; color:#000; font-size:9pt; }
+
+    .p-head{ display:flex; justify-content:space-between; align-items:flex-end;
+      border-bottom:3px solid var(--orange); padding-bottom:8px; margin-bottom:4px; }
+    .p-title{ font-family:var(--hdr-font); font-weight:700; text-transform:uppercase;
+      font-size:20pt; letter-spacing:.03em; margin:0; }
+    .p-sub{ font-size:9pt; color:#333; margin-top:3px; }
+    .p-week{ font-family:var(--hdr-font); font-weight:600; font-size:14pt;
+      color:var(--orange-d); text-transform:uppercase; text-align:right; }
+    .p-gen{ font-size:8pt; color:#555; text-align:right; margin-top:2px; }
+
+    .p-section{ margin-top:12px; page-break-inside:auto; }
+    .p-section h3{ font-family:var(--hdr-font); text-transform:uppercase; letter-spacing:.04em;
+      font-size:12pt; margin:0 0 4px; border-left:5px solid var(--orange); padding-left:8px; }
+
+    table.p-table{ border-collapse:collapse; width:100%; table-layout:fixed; }
+    table.p-table thead{ display:table-header-group; }
+    table.p-table th{
+      background:var(--orange) !important; color:#fff !important; font-family:var(--hdr-font);
+      font-weight:600; text-transform:uppercase; font-size:8pt; padding:4px 3px; text-align:left;
+      border:1px solid #fff; -webkit-print-color-adjust:exact; print-color-adjust:exact;
+    }
+    table.p-table th .dt{ display:block; font-weight:500; font-size:7pt; }
+    table.p-table td{ border:1px solid #c8c8c8; padding:3px 4px; font-size:8pt; vertical-align:top;
+      word-wrap:break-word; overflow-wrap:break-word; }
+    table.p-table tr{ page-break-inside:avoid; }
+    .p-eq{ font-family:var(--mono-font); font-weight:600; }
+    .p-shift{ display:block; margin-bottom:2px; line-height:1.25; }
+    .p-shift .lbl{ font-family:var(--hdr-font); font-weight:600; font-size:7pt; letter-spacing:.04em; }
+    .p-shift.day .lbl{ color:var(--orange-d); }
+    .p-shift.night .lbl{ color:#1d1d1f; }
+    .p-driver{ font-weight:600; }
+    .p-time{ font-size:7.5pt; color:#444; }
+    .p-job{ display:block; font-size:7.5pt; margin-top:2px; }
+    .p-loc{ display:block; font-size:7.5pt; color:#555; }
+    .p-task{ display:block; font-size:7.5pt; color:#333; font-style:italic; }
+    .p-maint{ display:block; font-family:var(--hdr-font); font-weight:700; font-size:8pt;
+      color:var(--orange-d); text-transform:uppercase; letter-spacing:.04em; }
+    .p-avail{ display:block; font-size:7.5pt; color:#2e7d32; font-style:italic; }
+    .p-cell-filled{ background:var(--orange-soft) !important; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .p-cell-maint{ background:repeating-linear-gradient(135deg,#fff 0 6px,var(--orange-soft-2) 6px 12px) !important;
+      -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    .p-col-eq{ width:7%; }
+
+    .p-notes{ margin-top:12px; font-size:8.5pt; }
+    .p-notes b{ font-family:var(--hdr-font); text-transform:uppercase; letter-spacing:.04em; }
+    .p-contacts{ margin-top:12px; page-break-inside:avoid; }
+    .p-contacts h3{ font-family:var(--hdr-font); text-transform:uppercase; font-size:11pt;
+      border-left:5px solid var(--orange); padding-left:8px; margin:0 0 4px; }
+    .p-contacts table{ border-collapse:collapse; width:100%; }
+    .p-contacts th, .p-contacts td{ border:1px solid #c8c8c8; padding:3px 6px; font-size:8pt; text-align:left; }
+    .p-contacts th{ background:#1d1d1f !important; color:#fff !important;
+      -webkit-print-color-adjust:exact; print-color-adjust:exact; font-family:var(--hdr-font); }
+    .p-empty{ font-size:8pt; color:#777; font-style:italic; padding:4px 0; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="hazard"></div>
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="mark">DR</div>
+        <div>
+          <h1>Weekly Driver Schedule</h1>
+          <div class="sub">Equipment &amp; Crew Assignment Board</div>
+        </div>
+      </div>
+      <div class="controls">
+        <div class="field">
+          <label for="weekPicker">Schedule Week</label>
+          <input type="week" id="weekPicker">
+        </div>
+        <button class="btn btn-primary" id="btnPdf">Generate PDF</button>
+        <button class="btn btn-ghost" id="btnClear">Clear Week</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="meta">
+    <div class="field">
+      <label for="prepBy">Prepared By</label>
+      <input type="text" id="prepBy" placeholder="Your name">
+    </div>
+    <div class="field" style="flex:1; min-width:260px;">
+      <label for="notes">Notes (printed on report)</label>
+      <input type="text" id="notes" placeholder="Optional notes for the team…">
+    </div>
+    <div class="week-range" id="weekRange">—</div>
+  </div>
+
+  <main>
+    <section class="section" id="sec-mixers">
+      <div class="section-head">
+        <span class="tag">Fleet</span>
+        <h2>Concrete Mixer Trucks</h2>
+        <span class="count" id="cnt-mixers"></span>
+      </div>
+      <div class="table-wrap"><table id="tbl-mixers"></table></div>
+    </section>
+
+    <section class="section" id="sec-dumps">
+      <div class="section-head">
+        <span class="tag">Fleet</span>
+        <h2>Dump Trucks</h2>
+        <span class="count" id="cnt-dumps"></span>
+      </div>
+      <div class="table-wrap"><table id="tbl-dumps"></table></div>
+    </section>
+
+    <p class="hint">Each day cell has a <b>Day Shift</b> and <b>Night Shift</b>, and each shift takes a driver, a start time, and its own <b>Job</b>, <b>Location</b>, and <b>Task</b>. Check <b>Down for maintenance</b> to take a truck out of service that day; leave a day with nothing assigned and it reads <b>Available to anyone</b>. Assigned days highlight <b>orange</b>, maintenance days show hazard stripes. Each week is kept in memory as you switch — hit <b>Generate PDF</b> and choose “Save as PDF” (landscape).</p>
+  </main>
+
+  <div id="printRoot"></div>
+
+<script>
+/* ============ DATA ============ */
+const drivers = [
+  {EmpId:"1111", name:"Mark Mol",      phone:"(111) 000-0000"},
+  {EmpId:"1234", name:"Test Driver",    phone:"(000) 000-0000"}
+];
+
+const ConcreteMixerTrucks = ["20086","20087","20090","20091","20092","20093","20095","20096","20098"];
+const DumpTrucks = ["20651","20652","20653","21654","21655","21656","21657","21658","21659","21660","21661","21662","21663","21664","21665","21666","21667"];
+
+const driverById = {};
+drivers.forEach(d => driverById[d.EmpId] = d);
+
+const DOW = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
+
+/* ============ STATE ============ */
+/* data[weekKey] = { assign:{equip:{dayIdx:{maint,day:{driver,start,job,location,task},night:{...}}}}, prepBy, notes } */
+const data = {};
+let currentWeek = null;
+
+function emptyShift(){ return { driver:"", start:"", job:"", location:"", task:"" }; }
+function emptyDay(){ return { maint:false, day:emptyShift(), night:emptyShift() }; }
+function shiftFilled(s){
+  return !!(s.driver || s.start || (s.job && s.job.trim()) || (s.location && s.location.trim()) || (s.task && s.task.trim()));
+}
+function ensureWeek(k){
+  if(!data[k]) data[k] = { assign:{}, prepBy:"", notes:"" };
+  return data[k];
+}
+function ensureAssign(wk, eq, day){
+  if(!wk.assign[eq]) wk.assign[eq] = {};
+  if(!wk.assign[eq][day]) wk.assign[eq][day] = emptyDay();
+  return wk.assign[eq][day];
+}
+
+/* ============ DATE HELPERS ============ */
+function getISOWeekString(date){
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  return d.getUTCFullYear() + "-W" + String(weekNo).padStart(2, "0");
+}
+function isoWeekToMonday(weekStr){
+  const [y, w] = weekStr.split("-W").map(Number);
+  const simple = new Date(y, 0, 1 + (w - 1) * 7);
+  const dow = simple.getDay();
+  const monday = new Date(simple);
+  if (dow <= 4) monday.setDate(simple.getDate() - simple.getDay() + 1);
+  else monday.setDate(simple.getDate() + 8 - simple.getDay());
+  return monday;
+}
+function weekDates(monday){
+  const arr = [];
+  for(let i=0;i<7;i++){ const d=new Date(monday); d.setDate(monday.getDate()+i); arr.push(d); }
+  return arr;
+}
+function fmtShort(d){ return d.toLocaleDateString("en-US",{month:"short",day:"numeric"}); }
+function fmtLong(d){ return d.toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"}); }
+function fmtTime(t){
+  if(!t) return "";
+  const [h,m] = t.split(":").map(Number);
+  const ap = h>=12 ? "PM":"AM";
+  const hr = (h%12)||12;
+  return hr + ":" + String(m).padStart(2,"0") + " " + ap;
+}
+
+/* ============ DRIVER OPTIONS ============ */
+const driverOptions = '<option value="">—</option>' +
+  drivers.map(d => `<option value="${d.EmpId}">${d.EmpId} · ${d.name}</option>`).join('');
+
+function shiftHtml(kind, label, eq, i, s){
+  return `<div class="shift ${kind}">`
+    + `<span class="shift-label">${label}</span>`
+    + `<select class="drv" data-equip="${eq}" data-day="${i}" data-shift="${kind}">${driverOptions}</select>`
+    + `<input type="time" class="tm" data-equip="${eq}" data-day="${i}" data-shift="${kind}" value="${escapeAttr(s.start)}" title="${label} start time">`
+    + `<input type="text" class="sf job" data-equip="${eq}" data-day="${i}" data-shift="${kind}" placeholder="Job" value="${escapeAttr(s.job)}">`
+    + `<input type="text" class="sf loc" data-equip="${eq}" data-day="${i}" data-shift="${kind}" placeholder="Location" value="${escapeAttr(s.location)}">`
+    + `<input type="text" class="sf task" data-equip="${eq}" data-day="${i}" data-shift="${kind}" placeholder="Task" value="${escapeAttr(s.task)}">`
+    + `</div>`;
+}
+
+/* ============ BUILD TABLES ============ */
+function buildSection(tableEl, equipList, dates){
+  const wk = ensureWeek(currentWeek);
+  let head = '<thead><tr>'
+    + '<th class="col-eq">Equip&nbsp;ID</th>';
+  dates.forEach((d,i)=>{
+    head += `<th><span class="dow">${DOW[i]}</span><span class="dt">${fmtShort(d)}</span></th>`;
+  });
+  head += '</tr></thead>';
+
+  let body = '<tbody>';
+  equipList.forEach(eq=>{
+    body += '<tr>';
+    body += `<td class="eq-cell"><span class="eq-id">${eq}</span></td>`;
+    for(let i=0;i<7;i++){
+      const a = (wk.assign[eq] && wk.assign[eq][i]) ? wk.assign[eq][i] : emptyDay();
+      body += `<td class="day-cell" data-equip="${eq}" data-day="${i}">`
+        + `<label class="maint-row"><input type="checkbox" class="mt" data-equip="${eq}" data-day="${i}"${a.maint ? " checked" : ""}> Down for maintenance</label>`
+        + shiftHtml("day", "Day Shift", eq, i, a.day)
+        + shiftHtml("night", "Night Shift", eq, i, a.night)
+        + `<span class="avail-tag">✓ Available to anyone</span>`
+        + `</td>`;
+    }
+    body += '</tr>';
+  });
+  body += '</tbody>';
+  tableEl.innerHTML = head + body;
+
+  // set select values (options exist now) and refresh each cell's visual state
+  tableEl.querySelectorAll(".day-cell").forEach(cell=>{
+    const eq = cell.dataset.equip, i = cell.dataset.day;
+    const a = (wk.assign[eq] && wk.assign[eq][i]) ? wk.assign[eq][i] : null;
+    if(a){
+      const ds = cell.querySelector('select.drv[data-shift="day"]'); if(ds) ds.value = a.day.driver || "";
+      const ns = cell.querySelector('select.drv[data-shift="night"]'); if(ns) ns.value = a.night.driver || "";
+    }
+    refreshCell(cell);
+  });
+}
+
+function refreshCell(cell){
+  const eq = cell.dataset.equip, i = cell.dataset.day;
+  const wk = ensureWeek(currentWeek);
+  const a = (wk.assign[eq] && wk.assign[eq][i]) ? wk.assign[eq][i] : null;
+  const maint = a ? a.maint : false;
+  const hasSlot = a ? (shiftFilled(a.day) || shiftFilled(a.night)) : false;
+  cell.classList.toggle("maint", !!maint);
+  cell.classList.toggle("assigned", !maint && hasSlot);
+  const tag = cell.querySelector(".avail-tag");
+  if(tag) tag.style.display = (!maint && !hasSlot) ? "block" : "none";
+}
+
+function escapeAttr(s){ return (s||"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;"); }
+
+function renderAll(){
+  const monday = isoWeekToMonday(currentWeek);
+  const dates = weekDates(monday);
+  buildSection(document.getElementById("tbl-mixers"), ConcreteMixerTrucks, dates);
+  buildSection(document.getElementById("tbl-dumps"), DumpTrucks, dates);
+  document.getElementById("cnt-mixers").textContent = ConcreteMixerTrucks.length + " units";
+  document.getElementById("cnt-dumps").textContent = DumpTrucks.length + " units";
+  document.getElementById("weekRange").textContent = fmtLong(dates[0]) + "  –  " + fmtLong(dates[6]);
+  // restore meta fields
+  const wk = ensureWeek(currentWeek);
+  document.getElementById("prepBy").value = wk.prepBy || "";
+  document.getElementById("notes").value = wk.notes || "";
+}
+
+/* ============ INPUT WIRING (event delegation) ============ */
+function handleInput(e){
+  const t = e.target;
+  const eq = t.dataset.equip;
+  if(!eq) return;
+  const wk = ensureWeek(currentWeek);
+  const a = ensureAssign(wk, eq, t.dataset.day);
+  if(t.classList.contains("mt")){
+    a.maint = t.checked;
+  } else if(t.classList.contains("drv")){
+    a[t.dataset.shift].driver = t.value;
+  } else if(t.classList.contains("tm")){
+    a[t.dataset.shift].start = t.value;
+  } else if(t.classList.contains("job")){
+    a[t.dataset.shift].job = t.value;
+  } else if(t.classList.contains("loc")){
+    a[t.dataset.shift].location = t.value;
+  } else if(t.classList.contains("task")){
+    a[t.dataset.shift].task = t.value;
+  }
+  const cell = t.closest(".day-cell");
+  if(cell) refreshCell(cell);
+}
+document.querySelector("main").addEventListener("input", handleInput);
+document.querySelector("main").addEventListener("change", handleInput);
+
+document.getElementById("prepBy").addEventListener("input", e=>{ ensureWeek(currentWeek).prepBy = e.target.value; });
+document.getElementById("notes").addEventListener("input", e=>{ ensureWeek(currentWeek).notes = e.target.value; });
+
+document.getElementById("weekPicker").addEventListener("change", e=>{
+  if(!e.target.value) return;
+  currentWeek = e.target.value;
+  renderAll();
+});
+
+document.getElementById("btnClear").addEventListener("click", ()=>{
+  if(confirm("Clear all shifts, maintenance flags, jobs and locations for this week?")){
+    data[currentWeek] = { assign:{}, prepBy:"", notes:"" };
+    renderAll();
+  }
+});
+
+/* ============ PDF / PRINT ============ */
+function rowHasData(wk, eq){
+  const a = wk.assign[eq];
+  if(!a) return false;
+  for(let i=0;i<7;i++){
+    const c = a[i];
+    if(!c) continue;
+    if(c.maint || shiftFilled(c.day) || shiftFilled(c.night)) return true;
+  }
+  return false;
+}
+
+function shiftPrint(kind, label, s){
+  const drv = s.driver ? driverById[s.driver] : null;
+  const nm = drv ? drv.name : (s.driver || "");
+  let inner = `<span class="lbl">${label}:</span> `;
+  if(nm) inner += `<span class="p-driver">${escapeHtml(nm)}</span>`;
+  if(s.start) inner += ` <span class="p-time">${fmtTime(s.start)}</span>`;
+  if(s.job && s.job.trim()) inner += `<span class="p-job">${escapeHtml(s.job)}</span>`;
+  if(s.location && s.location.trim()) inner += `<span class="p-loc">@ ${escapeHtml(s.location)}</span>`;
+  if(s.task && s.task.trim()) inner += `<span class="p-task">▸ ${escapeHtml(s.task)}</span>`;
+  return `<span class="p-shift ${kind}">${inner}</span>`;
+}
+
+function buildPrintTable(title, equipList, dates, wk){
+  const rows = equipList.filter(eq => rowHasData(wk, eq));
+  if(rows.length === 0){
+    return `<div class="p-section"><h3>${title}</h3><div class="p-empty">No assignments scheduled.</div></div>`;
+  }
+  let html = `<div class="p-section"><h3>${title}</h3><table class="p-table"><thead><tr>`
+    + '<th class="p-col-eq">Equip ID</th>';
+  dates.forEach((d,i)=>{ html += `<th>${DOW[i]}<span class="dt">${fmtShort(d)}</span></th>`; });
+  html += '</tr></thead><tbody>';
+
+  rows.forEach(eq=>{
+    html += '<tr>';
+    html += `<td class="p-eq">${eq}</td>`;
+    for(let i=0;i<7;i++){
+      const a = (wk.assign[eq] && wk.assign[eq][i]) ? wk.assign[eq][i] : emptyDay();
+      const dHas = shiftFilled(a.day);
+      const nHas = shiftFilled(a.night);
+
+      if(a.maint){
+        html += `<td class="p-cell-maint"><span class="p-maint">⚠ Maintenance</span></td>`;
+        continue;
+      }
+      if(!dHas && !nHas){
+        html += `<td><span class="p-avail">Available</span></td>`;
+        continue;
+      }
+      html += `<td class="p-cell-filled">`;
+      if(dHas) html += shiftPrint("day", "DAY", a.day);
+      if(nHas) html += shiftPrint("night", "NGT", a.night);
+      html += `</td>`;
+    }
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function buildContacts(wk, dates){
+  const used = new Set();
+  [...ConcreteMixerTrucks, ...DumpTrucks].forEach(eq=>{
+    const a = wk.assign[eq];
+    if(a){
+      for(let i=0;i<7;i++){
+        if(!a[i]) continue;
+        if(a[i].day && a[i].day.driver) used.add(a[i].day.driver);
+        if(a[i].night && a[i].night.driver) used.add(a[i].night.driver);
+      }
+    }
+  });
+  if(used.size === 0) return "";
+  const ids = [...used].sort();
+  let html = '<div class="p-contacts"><h3>Driver Contacts</h3><table><thead><tr>'
+    + '<th>Emp ID</th><th>Driver</th><th>Phone</th></tr></thead><tbody>';
+  ids.forEach(id=>{
+    const d = driverById[id] || {name:id, phone:""};
+    html += `<tr><td class="p-eq">${id}</td><td>${escapeHtml(d.name)}</td><td>${escapeHtml(d.phone)}</td></tr>`;
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function escapeHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function generatePDF(){
+  const wk = ensureWeek(currentWeek);
+  const monday = isoWeekToMonday(currentWeek);
+  const dates = weekDates(monday);
+  const range = fmtLong(dates[0]) + " – " + fmtLong(dates[6]);
+  const gen = new Date().toLocaleString("en-US",{dateStyle:"medium",timeStyle:"short"});
+
+  let html = '<div class="p-head"><div>'
+    + '<h1 class="p-title">Weekly Driver Schedule</h1>'
+    + `<div class="p-sub">Equipment &amp; Crew Assignment${wk.prepBy ? " &nbsp;·&nbsp; Prepared by " + escapeHtml(wk.prepBy) : ""}</div>`
+    + '</div><div>'
+    + `<div class="p-week">${range}</div>`
+    + `<div class="p-gen">Generated ${gen}</div>`
+    + '</div></div>';
+
+  html += buildPrintTable("Concrete Mixer Trucks", ConcreteMixerTrucks, dates, wk);
+  html += buildPrintTable("Dump Trucks", DumpTrucks, dates, wk);
+
+  if(wk.notes && wk.notes.trim()){
+    html += `<div class="p-notes"><b>Notes:</b> ${escapeHtml(wk.notes)}</div>`;
+  }
+  html += buildContacts(wk, dates);
+
+  document.getElementById("printRoot").innerHTML = html;
+  window.print();
+}
+document.getElementById("btnPdf").addEventListener("click", generatePDF);
+
+/* ============ INIT ============ */
+(function init(){
+  const todayWeek = getISOWeekString(new Date());
+  currentWeek = todayWeek;
+  document.getElementById("weekPicker").value = todayWeek;
+  renderAll();
+})();
+</script>
+</body>
+</html>
