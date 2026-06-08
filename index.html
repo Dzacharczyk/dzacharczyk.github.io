@@ -13,27 +13,39 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dave — Custom Web Application Development</title>
+<!-- EDIT: SEO — tune the title/description with your name and the exact terms clients search -->
+<title>Dzach.dev — Web Developer in Buffalo, NY | Custom Websites & Web Applications</title>
+<meta name="description" content="Freelance web developer serving Buffalo and Western New York. Custom websites, web applications, and software development for local businesses — over a decade of experience.">
+<meta name="keywords" content="web developer Buffalo NY, web design Western New York, custom websites Buffalo, web application development WNY, freelance software developer Buffalo, Hamburg NY web developer">
+<meta name="geo.region" content="US-NY">
+<meta name="geo.placename" content="Buffalo, New York">
+<meta property="og:title" content="Dzach.dev — Web Developer in Buffalo & Western New York">
+<meta property="og:description" content="Custom websites and web applications for businesses across Buffalo and Western New York.">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#f7f4ee;
-    --paper-2:#f1ece3;
-    --ink:#1c1a17;
-    --ink-soft:#5d574e;
-    --line:#ddd6c9;
-    --accent:#b0492c;
-    --accent-soft:#c97a5f;
+    --paper:#eff0f5;
+    --paper-2:#e6e8f1;
+    --ink:#181b2e;
+    --ink-soft:#565a72;
+    --line:#d9dbe6;
+    --accent:#2e3a8c;
+    --accent-soft:#6f7bd0;
+    --g-coral:#4d62c9;
+    --g-amber:#e8c560;
+    --g-rose:#d4a23c;
+    --g-clay:#2e3a8c;
     --max:1180px;
     --ease:cubic-bezier(.2,.7,.2,1);
   }
 
   *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  html{scroll-behavior:smooth;background:var(--paper)}
   body{
-    background:var(--paper);
+    background:transparent;
     color:var(--ink);
     font-family:"Hanken Grotesk",sans-serif;
     font-size:17px;
@@ -41,6 +53,24 @@
     -webkit-font-smoothing:antialiased;
     overflow-x:hidden;
   }
+
+  /* lively gradient mesh — drifts slowly behind the paper */
+  body::after{
+    content:"";position:fixed;inset:-25%;z-index:-1;pointer-events:none;
+    background:
+      radial-gradient(40% 38% at 18% 22%, color-mix(in srgb, var(--g-amber) 42%, transparent), transparent 70%),
+      radial-gradient(44% 42% at 82% 18%, color-mix(in srgb, var(--g-rose) 38%, transparent), transparent 70%),
+      radial-gradient(50% 46% at 70% 82%, color-mix(in srgb, var(--g-coral) 40%, transparent), transparent 72%),
+      radial-gradient(40% 40% at 25% 78%, color-mix(in srgb, var(--g-clay) 30%, transparent), transparent 70%);
+    filter:blur(28px);opacity:.5;
+    animation:drift 26s ease-in-out infinite alternate;
+  }
+  @keyframes drift{
+    0%{transform:translate3d(0,0,0) scale(1)}
+    50%{transform:translate3d(-3%,2%,0) scale(1.08)}
+    100%{transform:translate3d(3%,-2%,0) scale(1.04)}
+  }
+  @media(prefers-reduced-motion:reduce){body::after{animation:none}}
 
   /* subtle paper grain */
   body::before{
@@ -103,7 +133,15 @@
     font-size:clamp(46px,8.5vw,108px);
     letter-spacing:-.025em;max-width:14ch;
   }
-  .hero-title em{font-style:italic;color:var(--accent)}
+  .hero-title em{
+    font-style:italic;
+    background:linear-gradient(100deg,var(--g-clay),var(--g-coral) 38%,var(--g-rose) 64%,var(--g-amber));
+    background-size:200% auto;
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    animation:hue 8s ease-in-out infinite alternate;
+  }
+  @keyframes hue{0%{background-position:0% 50%}100%{background-position:100% 50%}}
   .hero-sub{
     margin-top:30px;font-size:clamp(18px,2vw,21px);color:var(--ink-soft);
     max-width:54ch;line-height:1.55;
@@ -115,7 +153,7 @@
     padding:15px 28px;border-radius:44px;font-size:15px;font-weight:500;
     transition:transform .3s var(--ease),background .3s;
   }
-  .btn:hover{transform:translateY(-2px);background:var(--accent)}
+  .btn:hover{transform:translateY(-2px);background:linear-gradient(100deg,var(--g-clay),var(--g-coral) 55%,var(--g-rose))}
   .btn .arrow{transition:transform .3s var(--ease)}
   .btn:hover .arrow{transform:translate(3px,-3px)}
   .btn-ghost{background:none;color:var(--ink-soft);padding:15px 6px}
@@ -174,16 +212,28 @@
   @media(max-width:720px){.work{grid-template-columns:40px 1fr;gap:18px}.work .meta{display:none}}
 
   /* about / cta band */
-  .band{background:var(--ink);color:var(--paper);border-radius:6px;padding:clamp(48px,7vw,96px)}
-  .band .label{color:var(--accent-soft)}
+  .band{
+    background:
+      radial-gradient(80% 120% at 88% -10%, color-mix(in srgb, var(--g-coral) 55%, transparent), transparent 60%),
+      radial-gradient(70% 100% at 0% 110%, color-mix(in srgb, var(--g-rose) 38%, transparent), transparent 60%),
+      linear-gradient(135deg,#20243d,var(--ink) 55%,#10121f);
+    color:var(--paper);border-radius:6px;padding:clamp(48px,7vw,96px);
+    position:relative;overflow:hidden;
+  }
+  .band .label{color:var(--g-amber)}
   .band h2{color:var(--paper);font-size:clamp(34px,5vw,64px);margin:22px 0 26px;max-width:16ch}
-  .band p{color:#cabfb1;max-width:48ch;font-size:18px}
-  .band .btn{background:var(--paper);color:var(--ink);margin-top:40px}
-  .band .btn:hover{background:var(--accent);color:var(--paper)}
+  .band p{color:#bcc0dd;max-width:48ch;font-size:18px}
+  .band .btn{background:linear-gradient(100deg,var(--g-amber),var(--g-coral));color:var(--ink);margin-top:40px}
+  .band .btn:hover{background:linear-gradient(100deg,var(--g-coral),var(--g-rose));color:var(--paper)}
 
   .stats{display:flex;gap:54px;margin-top:54px;flex-wrap:wrap}
-  .stat .big{font-family:"Fraunces",serif;font-size:46px;color:var(--paper)}
-  .stat .cap{font-size:13px;color:#a99e90;letter-spacing:.04em;margin-top:4px}
+  .stat .big{
+    font-family:"Fraunces",serif;font-size:46px;
+    background:linear-gradient(120deg,var(--g-amber),var(--g-coral),var(--g-rose));
+    -webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+  }
+  .stat .cap{font-size:13px;color:#9498bb;letter-spacing:.04em;margin-top:4px}
 
   /* footer */
   footer{padding:70px 0 50px}
@@ -212,7 +262,7 @@
 
 <nav id="nav">
   <!-- EDIT: your name / brand -->
-  <a href="#top" class="brand">Dave<span class="dot">.</span></a>
+  <a href="#top" class="brand">Dzach<span class="dot">.dev</span></a>
   <div class="nav-links">
     <a href="#services">Services</a>
     <a href="#approach">Approach</a>
@@ -224,10 +274,10 @@
 <div id="top"></div>
 <header>
   <div class="wrap">
-    <div class="avail reveal"><span class="pulse"></span> Available for select projects · 2026</div>
-    <h1 class="hero-title reveal">Custom web applications, <em>built to last.</em></h1>
+    <div class="avail reveal"><span class="pulse"></span> Buffalo &amp; Western New York · Available for select projects</div>
+    <h1 class="hero-title reveal">From custom websites to <em>full web applications.</em></h1>
     <!-- EDIT: tagline -->
-    <p class="hero-sub reveal">I'm a software engineer with over a decade of experience designing and shipping web applications for businesses — from first sketch to production. Reliable, maintainable software that actually moves the needle.</p>
+    <p class="hero-sub reveal">I'm a Buffalo-based software engineer with over a decade of experience building for the web — from polished marketing sites to custom business applications. Serving businesses across Western New York and beyond, from first sketch to production.</p>
     <div class="hero-actions reveal">
       <a href="#contact" class="btn">Start a project <span class="arrow">↗</span></a>
       <a href="#work" class="btn btn-ghost">See selected work →</a>
@@ -246,9 +296,9 @@
     <div class="services stagger">
       <div class="svc">
         <span class="idx">01</span>
-        <h3>Web applications</h3>
-        <p>Bespoke applications built around your workflow — customer portals, internal tools, dashboards, and data-driven products designed to scale with you.</p>
-        <div class="tags"><span>Full-stack</span><span>APIs</span><span>Dashboards</span></div>
+        <h3>Websites &amp; web apps</h3>
+        <p>Everything from a fast, polished marketing site to a bespoke application built around your workflow — customer portals, internal tools, dashboards, and data-driven products designed to scale with you.</p>
+        <div class="tags"><span>Websites</span><span>Full-stack</span><span>Dashboards</span></div>
       </div>
       <div class="svc">
         <span class="idx">02</span>
@@ -335,13 +385,13 @@
     <div class="band reveal">
       <span class="label">Let's build something</span>
       <h2>Have a project in mind? Let's talk it through.</h2>
-      <p>Whether it's a fully-formed brief or a rough idea, I'm glad to give you an honest read on scope, approach, and timeline — no obligation.</p>
+      <p>Whether you're a Western New York business that needs a website or a fully custom application, I'm glad to give you an honest read on scope, approach, and timeline — no obligation. A rough idea is enough to start.</p>
       <!-- EDIT: your email -->
-      <a href="mailto:you@example.com" class="btn">you@example.com <span class="arrow">↗</span></a>
+      <a href="mailto:hello@dzach.dev" class="btn">hello@dzach.dev <span class="arrow">↗</span></a>
       <div class="stats">
         <div class="stat"><div class="big">10+</div><div class="cap">Years building software</div></div>
         <div class="stat"><div class="big">Full-stack</div><div class="cap">Front to back, solo or with your team</div></div>
-        <div class="stat"><div class="big">Remote</div><div class="cap">Western New York · working remotely</div></div>
+        <div class="stat"><div class="big">Buffalo</div><div class="cap">Western NY · local &amp; remote</div></div>
       </div>
     </div>
   </div>
@@ -351,16 +401,16 @@
 <footer>
   <div class="wrap">
     <div class="foot">
-      <div class="big">Let's make it<br><a href="mailto:you@example.com">work →</a></div>
+      <div class="big">Let's make it<br><a href="mailto:hello@dzach.dev">work →</a></div>
       <!-- EDIT: social links -->
       <div class="foot-links">
         <a href="#" target="_blank" rel="noopener">LinkedIn</a>
-        <a href="#" target="_blank" rel="noopener">GitHub</a>
-        <a href="mailto:you@example.com">Email</a>
+        <a href="https://github.com/Dzacharczyk/dzacharczyk.github.io" target="_blank" rel="noopener">GitHub</a>
+        <a href="mailto:hello@dzach.dev">Email</a>
       </div>
     </div>
     <div class="foot-meta">
-      <span>© 2026 Dave. All rights reserved.</span>
+      <span>© 2026 Dzach.dev. All rights reserved.</span>
       <span>Designed &amp; built from scratch.</span>
     </div>
   </div>
